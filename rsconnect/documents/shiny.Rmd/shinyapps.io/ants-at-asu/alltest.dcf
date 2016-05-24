@@ -1,0 +1,9 @@
+name: alltest
+account: ants-at-asu
+server: shinyapps.io
+appId: 99971
+bundleId: 441851
+url: https://ants-at-asu.shinyapps.io/alltest/
+when: 1462390792.92103
+asMultiple: TRUE
+asStatic: FALSE

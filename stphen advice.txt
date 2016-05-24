@@ -1,0 +1,18 @@
+
+
+Things to say:
+-colonies explore
+	-and adapt
+-How well do colonies adapt in environments?
+	-compare static, unchanging models and perfect models
+
+
+Analyze more: tandems runs
+-important in terms of flexibility
+-do tandem runs correlate with success
+-null model based on simple rules: finding food, exploiting it. involving attrition?
+	-other aspects of zach's rules
+-how well does total number of truns to best source predict proformance?
+	-what about the difference between?
+	-what about WHEN they occur?
+*what about rate of regret over time?

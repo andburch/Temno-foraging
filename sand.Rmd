@@ -1,0 +1,55 @@
+---
+title: "sand"
+author: "Andrew Burchill"
+date: "May 3, 2016"
+output: html_document
+runtime: shiny
+resource_files:
+- .httr-oauth
+---
+```{r}
+library(rdrop2)
+outputDir <- "Shiny_temnos/Data/Andrew"
+
+loadData <- function() {
+  # Read all the files into a list
+  filesInfo <- drop_dir(outputDir)
+  filePaths <- filesInfo$path
+  data <- lapply(filePaths, drop_read_csv, stringsAsFactors = FALSE)
+  # Concatenate all data together into one data.frame
+  data <- do.call(rbind, data)
+  data
+}
+
+loadData()
+```
+
+
+## Quarterly Results {.tabset}
+
+### By Product
+
+(tab contentn)
+
+### By Region
+##Test
+```{r sand}
+
+inputPanel(
+    
+  # Copy the chunk below to make a group of checkboxes
+  checkboxGroupInput("checkGroup", label = h3("Checkbox group"), 
+    choices = list("Max in first envmt" = 1, "'Curve' in first envmt" = 2, "Max in second envmt" = 3, "'Curve' in second envmt" = 4,"tandems in first envmt" = 5, "tandems in first envmt" = 6),
+    selected = 1)
+  
+ 
+  
+)
+
+
+```
+
+
+#### D
+
+Hello?

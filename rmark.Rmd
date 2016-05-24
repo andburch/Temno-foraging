@@ -1,0 +1,139 @@
+---
+title: "temnos"
+author: "Andrew Burchill"
+date: "May 3, 2016"
+output: 
+  html_document: 
+    keep_md: yes
+---
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=6, fig.height=4, fig.path='Figs/',
+                      echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+
+```{r chunky, echo=FALSE, results="hide", warning=FALSE}
+
+{
+  ant_dynamic <- read.csv("Z:/Documents/Temno foraging/Ant data analysis/ant_dynamic.csv", stringsAsFactors=FALSE)
+  ant_dynamic$r=0
+  ant_dynamic$cum_r="NA"
+  
+  v.p =0.001
+  v.g = 0.01
+  v.b = 0.1
+  
+  ant_dynamic$r[which( (ant_dynamic$feeder2=="poor" | ant_dynamic$feeder2=="best") & ant_dynamic$environment=="environment 1" & ant_dynamic$event=="start")]<-v.g-v.p
+  
+  ant_dynamic$r[which( (ant_dynamic$feeder2=="poor") & ant_dynamic$environment=="environment 2" & ant_dynamic$event=="start")]<-v.b-v.p
+  ant_dynamic$r[which( (ant_dynamic$feeder2=="good") & ant_dynamic$environment=="environment 2" & ant_dynamic$event=="start")]<-v.b-v.g
+  ant_dynamic$r[which(ant_dynamic$event!="start")]<-"NA"
+  
+  
+  ant_dynamic$cum_r="NA"
+  ant_dynamic$t_step="NA"
+  ant_dynamic$r<-as.numeric(ant_dynamic$r)
+  ant_dynamic$cum_r<-as.numeric(ant_dynamic$cum_r)
+  ant_dynamic$t_step<-as.numeric(ant_dynamic$t_step)
+  
+  for (i in unique(ant_dynamic$groupID)){
+    print(i)
+    temp<-NULL
+    temp<-subset(ant_dynamic, groupID==i & event=="start" & environment=="environment 1")
+    
+    for(j in 1:nrow(temp)) {
+      if(j==1) {ant_dynamic$cum_r[as.numeric(rownames(temp[j,]))]<-ant_dynamic$r[as.numeric(rownames(temp[j,]))]; ant_dynamic$t_step[as.numeric(rownames(temp[j,]))]<-j} 
+      else {
+        ant_dynamic$cum_r[as.numeric(rownames(temp[j,]))] <- ant_dynamic$r[as.numeric(rownames(temp[j,]))]+ant_dynamic$cum_r[as.numeric(rownames(temp[j-1,]))]
+        ant_dynamic$t_step[as.numeric(rownames(temp[j,]))]<-j
+      }
+    }
+  }
+  
+  for (i in unique(ant_dynamic$groupID)){
+    print(i)
+    temp<-NULL
+    temp<-subset(ant_dynamic, groupID==i & event=="start" & environment=="environment 2")
+    
+    for(j in 1:nrow(temp)) {
+      if(j==1) {ant_dynamic$cum_r[as.numeric(rownames(temp[j,]))]<-ant_dynamic$r[as.numeric(rownames(temp[j,]))]; ant_dynamic$t_step[as.numeric(rownames(temp[j,]))]<-j} 
+      else {
+        ant_dynamic$cum_r[as.numeric(rownames(temp[j,]))] <- ant_dynamic$r[as.numeric(rownames(temp[j,]))]+ant_dynamic$cum_r[as.numeric(rownames(temp[j-1,]))]
+        ant_dynamic$t_step[as.numeric(rownames(temp[j,]))]<-j
+        
+      }
+    }
+  }
+  for(j in 1:nrow(ant_dynamic)) {
+    if (ant_dynamic$event[j]=="tandem"){
+      ant_dynamic$cum_r[j]<- -.03
+    }
+  }
+    ant_dynamic$min_since<-0
+  ant_dynamic$min_since[which(ant_dynamic$environment=="environment 1")]<- subset(ant_dynamic, environment=="environment 1")$minutes
+  
+  
+  for (i in unique(ant_dynamic$groupID)) {
+    ant_dynamic$min_since[which(ant_dynamic$environment=="environment 2" & ant_dynamic$groupID==i)]<- subset(ant_dynamic, environment=="environment 2"& groupID==i)$minutes -  ant_dynamic$minutes[which(ant_dynamic$event=="switch" & ant_dynamic$groupID==i)]  
+  }
+}
+
+
+```
+##Colonies in the dynamic environment
+
+```{r loadpackages, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
+library("sqldf", lib.loc="Z:/Programs/R-3.2.3/R-3.2.3v2/library")
+env1<-subset(ant_dynamic, environment=="environment 1")
+env2<-subset(ant_dynamic, environment=="environment 2")
+
+```
+There are `r length(unique(ant_dynamic$groupID))` colonies we tested: `r (unique(ant_dynamic$groupID))`. 
+
+####How much time and how many visits were there?
+```{r time-steps-hist, echo=FALSE, message=FALSE}
+par(mfrow=c(2,2))
+hist(sqldf("select max(visit2) from env1 group by groupID")[,1], main = "Number of visits in 1st environment", xlab = "Number of visits")
+hist(sqldf("select max(visit2) from env2 group by groupID")[,1], main = "Number of visits in 2nd environment", xlab = "Number of visits")
+hist(sqldf("select max(min_since) from env1 group by groupID")[,1], main = "Number of minutes in 1st environment", xlab = "Number of minutes")
+hist(sqldf("select max(min_since) from env2 group by groupID")[,1], main = "Number of minutes in 2nd environment", xlab = "Number of minutes")
+```
+
+###How did exploitation change over time?
+Below is an image depicting the changing allocations over time for the different colonies. 
+
+
+```{r plotting_stephen, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, results="hide"}
+setwd("Z:/Documents/Temno foraging")
+setwd("Z:/Documents/Temno foraging/Ant data analysis")
+source("Graphing functions.R")
+source("Count functions.R")
+library("magrittr", lib.loc="Z:/Programs/R-3.2.3/R-3.2.3v2/library")
+
+layout(matrix(c(1,1,1,2,1,1,1,3,1,1,1,4), 3, 4, byrow=TRUE), respect=TRUE)
+for (i in unique(ant_dynamic$groupID)){
+j<-paste(i," dynamic.csv",sep="")
+dat <- read.csv(j)
+#visits <- calc.visits(dat, poor=2, good=1, best=3)
+milestones <- calc.milestones(dat)
+switch.time <- milestones[1]
+end.time <- milestones[2]
+pre.visits <- milestones[3]
+pre.visits
+last.time <- max(dat$minutes)
+
+#dynamic.density(dat, switch.time, end.time, last.time, "E8 dynamic")
+dynamic.den2(dat, switch.time, end.time, last.time, j)
+dynamic.hist(dat, switch.time, end.time, j)
+print("")
+
+#cumulative.regret(dat, switch.time, end.time, last.time, "E14 dynamic")
+}
+```
+
+
+
+
+
+
+

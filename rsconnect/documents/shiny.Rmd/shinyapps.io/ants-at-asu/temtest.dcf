@@ -1,0 +1,9 @@
+name: temtest
+account: ants-at-asu
+server: shinyapps.io
+appId: 99970
+bundleId: 441849
+url: https://ants-at-asu.shinyapps.io/temtest/
+when: 1462390625.08917
+asMultiple: FALSE
+asStatic: FALSE

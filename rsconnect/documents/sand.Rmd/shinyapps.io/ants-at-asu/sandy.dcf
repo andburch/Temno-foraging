@@ -1,0 +1,10 @@
+name: sandy
+account: ants-at-asu
+server: shinyapps.io
+appId: 100159
+bundleId: 442750
+url: https://ants-at-asu.shinyapps.io/sandy/
+when: 1462473345.10368
+asMultiple: TRUE
+asStatic: FALSE
+ignoredFiles: rmark.Rmd|shiny.Rmd

@@ -1,0 +1,11 @@
+name: sand
+account: ants-at-asu
+server: shinyapps.io
+appId: 100158
+bundleId: 442744
+url: https://ants-at-asu.shinyapps.io/sand/
+when: 1462473086.59085
+asMultiple: TRUE
+asStatic: FALSE
+additionalFiles: .httr-oauth
+ignoredFiles: rmark.Rmd|shiny.Rmd

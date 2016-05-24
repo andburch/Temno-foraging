@@ -1,0 +1,10 @@
+name: shinyv
+account: ants-at-asu
+server: shinyapps.io
+appId: 100167
+bundleId: 442789
+url: https://ants-at-asu.shinyapps.io/shinyv/
+when: 1462475442.1065
+asMultiple: TRUE
+asStatic: FALSE
+ignoredFiles: rmark.Rmd|sand.Rmd
